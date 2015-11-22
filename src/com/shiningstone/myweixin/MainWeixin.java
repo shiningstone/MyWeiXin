@@ -48,16 +48,9 @@ public class MainWeixin extends Activity {
 	public static MainWeixin instance = null;
 	 
     private Headers mTabHeader;
+    private int TAB_WIDTH = 0;
+    private int CURSOR_OFFSET = 0;
 	private ViewPager mTabPager;	
-
-	private LinearLayout mClose;
-    private LinearLayout mCloseBtn;
-    private View layout;	
-	private boolean menu_display = false;
-	private PopupWindow menuWindow;
-	private LayoutInflater inflater;
-	//private Button mRightBtn;
-	
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +62,56 @@ public class MainWeixin extends Activity {
         
         initHeaders();
         initPageViewer();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if(hasFocus) {
+            TAB_WIDTH = getWindowManager().getDefaultDisplay().getWidth() / SRC_HEADER.length;
+            CURSOR_OFFSET = (TAB_WIDTH - findViewById(SRC_HEADER_CURSOR).getWidth())/2;
+
+            mTabHeader.choose(0);
+        }
+    }
+
+	//设置标题栏右侧按钮的作用
+	public void btnmainright(View v) {  
+		//Intent intent = new Intent (MainWeixin.this,MainTopRightDialog.class);			
+		//startActivity(intent);	
+      }  	
+	public void startchat(View v) {      //小黑  对话界面
+		//Intent intent = new Intent (MainWeixin.this,ChatActivity.class);			
+		//startActivity(intent);	
+      }  
+	public void exit_settings(View v) {                           //退出  伪“对话框”，其实是一个activity
+		//Intent intent = new Intent (MainWeixin.this,ExitFromSettings.class);			
+		//startActivity(intent);	
+	 }
+	public void btn_shake(View v) {                                   //手机摇一摇
+		//Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);			
+		//startActivity(intent);	
+	}
+    
+	/*******************************************
+        key actions
+    *******************************************/
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    	if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            return _onBackPressed();
+    	} else if(keyCode == KeyEvent.KEYCODE_MENU){
+            return false;
+		}
+        
+    	return false;
+    }
+
+    protected boolean _onBackPressed() {
+        //Intent intent = new Intent();
+        //intent.setClass(MainWeixin.this,Exit.class);
+        //startActivity(intent);
+
+        return true;
     }
 
 	/*******************************************
@@ -86,29 +129,28 @@ public class MainWeixin extends Activity {
 
     private class Headers {
         private class Header {
-            private ImageView mView;
+            private ImageView mIvView;
             private int mId;
             private int mNormalRes;
             private int mPressedRes;
             
             public Header(int idx, View view, int normalRes, int pressedRes) {
                 mId = idx;
-                mView = (ImageView)view;
+                mIvView = (ImageView)view;
                 mNormalRes = normalRes;
                 mPressedRes = pressedRes;
 
-                mView.setOnClickListener(new HeaderClickListener());
+                mIvView.setOnClickListener(new HeaderClickListener());
             }
 
             public void setChoose(boolean flag) {
                 int resId = flag==true ? mPressedRes : mNormalRes;
-                mView.setImageDrawable( getResources().getDrawable(resId) );
+                mIvView.setImageDrawable( getResources().getDrawable(resId) );
             }
         };
         
         private ArrayList<Header> mList = new ArrayList<Header>();
-        private ImageView mCursor;
-        private int TAB_WIDTH = 0;
+        private ImageView mIvCursor;
         private int mChosen = 0;
         
         public void add(View view, int normalRes, int pressedRes) {
@@ -116,15 +158,13 @@ public class MainWeixin extends Activity {
         }
 
         public void addCursor(View view) {
-            mCursor = (ImageView)view;
-
-            TAB_WIDTH = getWindowManager().getDefaultDisplay().getWidth() / mList.size();
+            mIvCursor = (ImageView)view;
         }
 
         public boolean choose(int target) {
+            moveCursor(mChosen, target);
+            
             if(mChosen!=target) {
-                moveCursor(mChosen, target);
-
                 for(Header header : mList) {
                     if(header.mId==target) {
                         header.setChoose(true);
@@ -141,19 +181,17 @@ public class MainWeixin extends Activity {
         }
 
         private void moveCursor(int from, int to) {
-            int offset = (TAB_WIDTH - mCursor.getWidth())/2;
-
-            Animation animation = new TranslateAnimation(TAB_WIDTH*from+offset, TAB_WIDTH*to+offset, 0, 0);
+            Animation animation = new TranslateAnimation(TAB_WIDTH*from+CURSOR_OFFSET, TAB_WIDTH*to+CURSOR_OFFSET, 0, 0);
             animation.setFillAfter(true);
             animation.setDuration(150);
-            mCursor.startAnimation(animation);
+            mIvCursor.startAnimation(animation);
         }
         
     	private class HeaderClickListener implements View.OnClickListener {
     		@Override
     		public void onClick(View v) {
     		    for(Header header : mList) {
-                    if(header.mView==v) {
+                    if(header.mIvView==v) {
                         mTabPager.setCurrentItem(header.mId);
                     }
                 }      
@@ -215,82 +253,6 @@ public class MainWeixin extends Activity {
 		}
 	}
 	
-
-
-
-	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-    	if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {  //获取 back键
-    		
-        	if(menu_display){         //如果 Menu已经打开 ，先关闭Menu
-        		menuWindow.dismiss();
-        		menu_display = false;
-        		}
-        	else {
-        		//Intent intent = new Intent();
-            	//intent.setClass(MainWeixin.this,Exit.class);
-            	//startActivity(intent);
-        	}
-    	}
-    	
-    	else if(keyCode == KeyEvent.KEYCODE_MENU){   //获取 Menu键			
-			if(!menu_display){
-				//获取LayoutInflater实例
-				inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
-				//这里的main布局是在inflate中加入的哦，以前都是直接this.setContentView()的吧？呵呵
-				//该方法返回的是一个View的对象，是布局中的根
-				layout = inflater.inflate(R.layout.main_menu, null);
-				
-				//下面我们要考虑了，我怎样将我的layout加入到PopupWindow中呢？？？很简单
-				menuWindow = new PopupWindow(layout,LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT); //后两个参数是width和height
-				//menuWindow.showAsDropDown(layout); //设置弹出效果
-				//menuWindow.showAsDropDown(null, 0, layout.getHeight());
-				menuWindow.showAtLocation(this.findViewById(R.id.mainweixin), Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0); //设置layout在PopupWindow中显示的位置
-				//如何获取我们main中的控件呢？也很简单
-				mClose = (LinearLayout)layout.findViewById(R.id.menu_close);
-				mCloseBtn = (LinearLayout)layout.findViewById(R.id.menu_close_btn);
-				
-				
-				//下面对每一个Layout进行单击事件的注册吧。。。
-				//比如单击某个MenuItem的时候，他的背景色改变
-				//事先准备好一些背景图片或者颜色
-				mCloseBtn.setOnClickListener (new View.OnClickListener() {					
-					@Override
-					public void onClick(View arg0) {						
-						//Intent intent = new Intent();
-			        	//intent.setClass(MainWeixin.this,Exit.class);
-			        	//startActivity(intent);
-			        	menuWindow.dismiss(); //响应点击事件之后关闭Menu
-					}
-				});				
-				menu_display = true;				
-			}else{
-				//如果当前已经为显示状态，则隐藏起来
-				menuWindow.dismiss();
-				menu_display = false;
-				}
-			
-			return false;
-		}
-    	return false;
-    }
-	//设置标题栏右侧按钮的作用
-	public void btnmainright(View v) {  
-		//Intent intent = new Intent (MainWeixin.this,MainTopRightDialog.class);			
-		//startActivity(intent);	
-      }  	
-	public void startchat(View v) {      //小黑  对话界面
-		//Intent intent = new Intent (MainWeixin.this,ChatActivity.class);			
-		//startActivity(intent);	
-      }  
-	public void exit_settings(View v) {                           //退出  伪“对话框”，其实是一个activity
-		//Intent intent = new Intent (MainWeixin.this,ExitFromSettings.class);			
-		//startActivity(intent);	
-	 }
-	public void btn_shake(View v) {                                   //手机摇一摇
-		//Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);			
-		//startActivity(intent);	
-	}
 }
     
     
