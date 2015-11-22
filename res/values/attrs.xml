@@ -1,0 +1,14 @@
+<resources>
+
+    <declare-styleable name="ControlOption">
+        <attr name="Text" format="reference|string"></attr>
+        <attr name="Img" format="reference|integer"></attr>
+        <attr name="Mode" >
+            <enum name="Single" value="0"></enum>
+            <enum name="Top" value="1"></enum>
+            <enum name="Middle" value="2"></enum>
+            <enum name="Bottom" value="3"></enum>
+        </attr>
+    </declare-styleable>
+
+</resources>
