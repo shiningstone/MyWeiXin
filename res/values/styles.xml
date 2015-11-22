@@ -28,6 +28,18 @@
         <item name="android:windowAnimationStyle">@style/AnimFade</item>       
     </style> 
     
+    <!-- Option style. -->
+    <style name="option">
+        <item name="android:layout_height">wrap_content</item>       
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="option_top" parent="@style/option">
+        <item name="android:layout_marginTop">14dp</item>
+    </style>
+    
     <!-- Title style. -->
     <style name="title_bar">
         <item name="android:layout_height">45dp</item>       

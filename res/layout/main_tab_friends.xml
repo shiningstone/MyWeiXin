@@ -10,28 +10,15 @@
             <TextView style="@style/title_text" android:text="@string/tab3"/> 
 		</LinearLayout>
 
-        <com.shiningstone.myweixin.ControlOption                         
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:background="@drawable/preference_single_item"
+        <com.shiningstone.myweixin.ControlOption style="@style/option_top"
             local:Img="@drawable/find_more_friend_addfriend_icon"
             local:Text="添加朋友" 
-            local:Mode="Single">
-        </com.shiningstone.myweixin.ControlOption>
+            local:Mode="Standalone" />
 
-        <com.shiningstone.myweixin.ControlOption                         
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:background="@drawable/preference_single_item"
+        <com.shiningstone.myweixin.ControlOption style="@style/option_top"
+            android:onClick="btn_shake"
             local:Img="@drawable/find_more_friend_shake"
             local:Text="摇一摇" 
-            local:Mode="Single">
-        </com.shiningstone.myweixin.ControlOption>
+            local:Mode="Standalone" />
         
     </LinearLayout>

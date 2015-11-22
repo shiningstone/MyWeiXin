@@ -10,6 +10,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class ControlOption extends RelativeLayout {
+	private static int SRC_BG[] = {
+		R.drawable.preference_single_item,
+		R.drawable.preference_first_item,
+		R.drawable.preference_item,
+		R.drawable.preference_last_item,
+	};
+	
 	private ImageView mImage;
 	private TextView mText;
 	
@@ -18,6 +25,7 @@ public class ControlOption extends RelativeLayout {
 		LayoutInflater.from(context).inflate(R.layout.control_option, this, true);  
         
 		mImage = (ImageView)findViewById(R.id.image);
+        mImage.setVisibility(GONE);
 		mText = (TextView)findViewById(R.id.text);
         
         int resourceId = -1;
@@ -30,6 +38,7 @@ public class ControlOption extends RelativeLayout {
             switch (attr) {
 	            case R.styleable.ControlOption_Mode:
 	                resourceId = typedArray.getInt(R.styleable.ControlOption_Mode, 0);
+	                this.setBackgroundResource(SRC_BG[resourceId]);
 	                break;
 	            case R.styleable.ControlOption_Text:
 	                resourceId = typedArray.getResourceId(R.styleable.ControlOption_Text, 0);
@@ -39,7 +48,10 @@ public class ControlOption extends RelativeLayout {
 	                break;
 	            case R.styleable.ControlOption_Img:
 	                resourceId = typedArray.getResourceId(R.styleable.ControlOption_Img, 0);
-	                mImage.setImageResource(resourceId > 0 ? resourceId : R.drawable.ic_launcher);
+	                if(resourceId>0) {
+		                mImage.setVisibility(VISIBLE);
+		                mImage.setImageResource(resourceId);
+	                }
 	                break;   
             }
         }
