@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 public class MainWeixin extends Activity {
 	/*******************************************
-        resource configruation
+        resource configuration
     *******************************************/
     private static int SRC_SUB_LAYOUT[] = {
     	R.layout.main_tab_weixin,

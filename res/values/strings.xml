@@ -3,4 +3,10 @@
     <string name="app_name">我的微信 </string>
     <string name="title_activity_main">我的微信</string>
     
+    <string name="tab1">微信</string>
+    <string name="tab2">通讯录</string>
+    <string name="tab2_button">群聊</string>
+    <string name="tab3">朋友们</string>
+    <string name="tab4">设置</string>
+
 </resources>

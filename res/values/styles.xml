@@ -27,4 +27,38 @@
     <style name="Anim_style2" parent="android:Theme.NoTitleBar">         
         <item name="android:windowAnimationStyle">@style/AnimFade</item>       
     </style> 
+    
+    <!-- Title style. -->
+    <style name="title_bar">
+        <item name="android:layout_height">45dp</item>       
+        <item name="android:layout_width">fill_parent</item>       
+        <item name="android:id">@+id/title</item>       
+        <item name="android:background">@drawable/title_bar</item>
+    </style>
+    
+    <style name="title_bar_pure" parent="@style/title_bar">
+        <item name="android:gravity">center_vertical|center_horizontal</item>       
+    </style>
+
+    <style name="title_bar_with_button" parent="@style/title_bar">
+        <item name="android:gravity">center_vertical</item>       
+    </style>
+
+    <style name="title_text">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:layout_width">wrap_content</item>       
+        <item name="android:layout_height">wrap_content</item>       
+        <item name="android:layout_centerInParent">true</item>       
+    </style>
+    
+    <style name="title_button">
+        <item name="android:layout_width">67dp</item>       
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_height">wrap_content</item>       
+        <item name="android:layout_alignParentRight">true</item>       
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:background">@drawable/title_btn_right</item>
+    </style>
+    
 </resources>
