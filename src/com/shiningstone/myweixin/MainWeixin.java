@@ -1,6 +1,5 @@
 package com.shiningstone.myweixin;
 
-
 import java.util.ArrayList;
 
 import android.os.Bundle;
@@ -24,17 +23,33 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 public class MainWeixin extends Activity {
-	
+	/*******************************************
+        resource configruation
+    *******************************************/
+    private static int SRC_SUB_LAYOUT[] = {
+    	R.layout.main_tab_weixin,
+    	R.layout.main_tab_address,
+    	R.layout.main_tab_friends,
+    	R.layout.main_tab_settings,
+    };
+    
+    private static int SRC_HEADER[][] = {
+        {R.id.img_weixin, R.drawable.tab_weixin_normal, R.drawable.tab_weixin_pressed},
+        {R.id.img_address, R.drawable.tab_address_normal, R.drawable.tab_address_pressed},
+        {R.id.img_friends, R.drawable.tab_friends_normal, R.drawable.tab_friends_pressed},
+        {R.id.img_settings, R.drawable.tab_settings_normal, R.drawable.tab_settings_pressed},
+    };
+
+    private static int SRC_HEADER_CURSOR = R.id.img_tab_now;
+
+	/*******************************************
+        local variables
+    *******************************************/
 	public static MainWeixin instance = null;
 	 
+    private Headers mTabHeader;
 	private ViewPager mTabPager;	
-	private ImageView mTabImg;// 动画图片
-	private ImageView mTab1,mTab2,mTab3,mTab4;
-	private int zero = 0;// 动画图片偏移量
-	private int currIndex = 0;// 当前页卡编号
-	private int one;//单个水平动画位移
-	private int two;
-	private int three;
+
 	private LinearLayout mClose;
     private LinearLayout mCloseBtn;
     private View layout;	
@@ -43,6 +58,7 @@ public class MainWeixin extends Activity {
 	private LayoutInflater inflater;
 	//private Button mRightBtn;
 	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,50 +66,114 @@ public class MainWeixin extends Activity {
          //启动activity时不自动弹出软键盘
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
         instance = this;
-        /*
-        mRightBtn = (Button) findViewById(R.id.right_btn);
-        mRightBtn.setOnClickListener(new Button.OnClickListener()
-		{	@Override
-			public void onClick(View v)
-			{	showPopupWindow (MainWeixin.this,mRightBtn);
-			}
-		  });*/
         
+        initHeaders();
+        initPageViewer();
+    }
+
+	/*******************************************
+        header actions
+    *******************************************/
+    private void initHeaders() {
+        mTabHeader = new Headers();
+
+        for(int i=0; i<SRC_HEADER.length; i++) {
+            mTabHeader.add(findViewById(SRC_HEADER[i][0]), SRC_HEADER[i][1], SRC_HEADER[i][2]);
+        }
+
+        mTabHeader.addCursor(findViewById(SRC_HEADER_CURSOR));
+    }
+
+    private class Headers {
+        private class Header {
+            private ImageView mView;
+            private int mId;
+            private int mNormalRes;
+            private int mPressedRes;
+            
+            public Header(int idx, View view, int normalRes, int pressedRes) {
+                mId = idx;
+                mView = (ImageView)view;
+                mNormalRes = normalRes;
+                mPressedRes = pressedRes;
+
+                mView.setOnClickListener(new HeaderClickListener());
+            }
+
+            public void setChoose(boolean flag) {
+                int resId = flag==true ? mPressedRes : mNormalRes;
+                mView.setImageDrawable( getResources().getDrawable(resId) );
+            }
+        };
+        
+        private ArrayList<Header> mList = new ArrayList<Header>();
+        private ImageView mCursor;
+        private int TAB_WIDTH = 0;
+        private int mChosen = 0;
+        
+        public void add(View view, int normalRes, int pressedRes) {
+            mList.add(new Header(mList.size(), view, normalRes, pressedRes));
+        }
+
+        public void addCursor(View view) {
+            mCursor = (ImageView)view;
+
+            TAB_WIDTH = getWindowManager().getDefaultDisplay().getWidth() / mList.size();
+        }
+
+        public boolean choose(int target) {
+            if(mChosen!=target) {
+                moveCursor(mChosen, target);
+
+                for(Header header : mList) {
+                    if(header.mId==target) {
+                        header.setChoose(true);
+                    } else {
+                        header.setChoose(false);
+                    }
+                }
+
+                mChosen = target;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private void moveCursor(int from, int to) {
+            int offset = (TAB_WIDTH - mCursor.getWidth())/2;
+
+            Animation animation = new TranslateAnimation(TAB_WIDTH*from+offset, TAB_WIDTH*to+offset, 0, 0);
+            animation.setFillAfter(true);
+            animation.setDuration(150);
+            mCursor.startAnimation(animation);
+        }
+        
+    	private class HeaderClickListener implements View.OnClickListener {
+    		@Override
+    		public void onClick(View v) {
+    		    for(Header header : mList) {
+                    if(header.mView==v) {
+                        mTabPager.setCurrentItem(header.mId);
+                    }
+                }      
+    		}
+    	};
+    };
+
+	/*******************************************
+        page viewer actions
+    *******************************************/
+    private void initPageViewer() {
         mTabPager = (ViewPager)findViewById(R.id.tabpager);
         mTabPager.setOnPageChangeListener(new MyOnPageChangeListener());
         
-        mTab1 = (ImageView) findViewById(R.id.img_weixin);
-        mTab2 = (ImageView) findViewById(R.id.img_address);
-        mTab3 = (ImageView) findViewById(R.id.img_friends);
-        mTab4 = (ImageView) findViewById(R.id.img_settings);
-        mTabImg = (ImageView) findViewById(R.id.img_tab_now);
-        mTab1.setOnClickListener(new MyOnClickListener(0));
-        mTab2.setOnClickListener(new MyOnClickListener(1));
-        mTab3.setOnClickListener(new MyOnClickListener(2));
-        mTab4.setOnClickListener(new MyOnClickListener(3));
-        Display currDisplay = getWindowManager().getDefaultDisplay();//获取屏幕当前分辨率
-        int displayWidth = currDisplay.getWidth();
-        int displayHeight = currDisplay.getHeight();
-        one = displayWidth/4; //设置水平动画平移大小
-        two = one*2;
-        three = one*3;
-        //Log.i("info", "获取的屏幕分辨率为" + one + two + three + "X" + displayHeight);
-        
-        //InitImageView();//使用动画
-      //将要分页显示的View装入数组中
-        LayoutInflater mLi = LayoutInflater.from(this);
-        View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
-        View view2 = mLi.inflate(R.layout.main_tab_address, null);
-        View view3 = mLi.inflate(R.layout.main_tab_friends, null);
-        View view4 = mLi.inflate(R.layout.main_tab_settings, null);
-        
-      //每个页面的view数据
         final ArrayList<View> views = new ArrayList<View>();
-        views.add(view1);
-        views.add(view2);
-        views.add(view3);
-        views.add(view4);
-      //填充ViewPager的数据适配器
+        LayoutInflater mLi = LayoutInflater.from(this);
+        for(int i=0; i<SRC_SUB_LAYOUT.length; i++) {
+            views.add(mLi.inflate(SRC_SUB_LAYOUT[i], null));
+        }
+
         PagerAdapter mPagerAdapter = new PagerAdapter() {
 			
 			@Override
@@ -111,11 +191,6 @@ public class MainWeixin extends Activity {
 				((ViewPager)container).removeView(views.get(position));
 			}
 			
-			//@Override
-			//public CharSequence getPageTitle(int position) {
-				//return titles.get(position);
-			//}
-			
 			@Override
 			public Object instantiateItem(View container, int position) {
 				((ViewPager)container).addView(views.get(position));
@@ -125,89 +200,10 @@ public class MainWeixin extends Activity {
 		
 		mTabPager.setAdapter(mPagerAdapter);
     }
-    /**
-	 * 头标点击监听
-	 */
-	public class MyOnClickListener implements View.OnClickListener {
-		private int index = 0;
-
-		public MyOnClickListener(int i) {
-			index = i;
-		}
-		@Override
-		public void onClick(View v) {
-			mTabPager.setCurrentItem(index);
-		}
-	};
-    
-	 /* 页卡切换监听(原作者:D.Winter)
-	 */
-	public class MyOnPageChangeListener implements OnPageChangeListener {
+	private class MyOnPageChangeListener implements OnPageChangeListener {
 		@Override
 		public void onPageSelected(int arg0) {
-			Animation animation = null;
-			switch (arg0) {
-			case 0:
-				mTab1.setImageDrawable(getResources().getDrawable(R.drawable.tab_weixin_pressed));
-				if (currIndex == 1) {
-					animation = new TranslateAnimation(one, 0, 0, 0);
-					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.tab_address_normal));
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, 0, 0, 0);
-					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.tab_find_frd_normal));
-				}
-				else if (currIndex == 3) {
-					animation = new TranslateAnimation(three, 0, 0, 0);
-					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.tab_settings_normal));
-				}
-				break;
-			case 1:
-				mTab2.setImageDrawable(getResources().getDrawable(R.drawable.tab_address_pressed));
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(zero, one, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.tab_weixin_normal));
-				} else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, one, 0, 0);
-					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.tab_find_frd_normal));
-				}
-				else if (currIndex == 3) {
-					animation = new TranslateAnimation(three, one, 0, 0);
-					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.tab_settings_normal));
-				}
-				break;
-			case 2:
-				mTab3.setImageDrawable(getResources().getDrawable(R.drawable.tab_find_frd_pressed));
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(zero, two, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.tab_weixin_normal));
-				} else if (currIndex == 1) {
-					animation = new TranslateAnimation(one, two, 0, 0);
-					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.tab_address_normal));
-				}
-				else if (currIndex == 3) {
-					animation = new TranslateAnimation(three, two, 0, 0);
-					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.tab_settings_normal));
-				}
-				break;
-			case 3:
-				mTab4.setImageDrawable(getResources().getDrawable(R.drawable.tab_settings_pressed));
-				if (currIndex == 0) {
-					animation = new TranslateAnimation(zero, three, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.tab_weixin_normal));
-				} else if (currIndex == 1) {
-					animation = new TranslateAnimation(one, three, 0, 0);
-					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.tab_address_normal));
-				}
-				else if (currIndex == 2) {
-					animation = new TranslateAnimation(two, three, 0, 0);
-					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.tab_find_frd_normal));
-				}
-				break;
-			}
-			currIndex = arg0;
-			animation.setFillAfter(true);// True:图片停在动画结束位置
-			animation.setDuration(150);
-			mTabImg.startAnimation(animation);
+            mTabHeader.choose(arg0);
 		}
 		
 		@Override
@@ -219,6 +215,9 @@ public class MainWeixin extends Activity {
 		}
 	}
 	
+
+
+
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
     	if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {  //获取 back键

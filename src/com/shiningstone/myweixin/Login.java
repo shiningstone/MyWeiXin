@@ -11,36 +11,35 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class Login extends Activity {
-	private EditText mUser; // ’ ∫≈±‡º≠øÚ
-	private EditText mPassword; // √‹¬Î±‡º≠øÚ
+	private EditText EtUsername;
+	private EditText EtPassword;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         
-        mUser = (EditText)findViewById(R.id.login_user_edit);
-        mPassword = (EditText)findViewById(R.id.login_passwd_edit);
-        
+        EtUsername = (EditText)findViewById(R.id.login_user_edit);
+        EtPassword = (EditText)findViewById(R.id.login_passwd_edit);
     }
 
-    public void login_mainweixin(View v) {
-    	if("buaa".equals(mUser.getText().toString()) && "123".equals(mPassword.getText().toString()))   //≈–∂œ ’ ∫≈∫Õ√‹¬Î
+    public void onBtnLoginClicked(View v) {
+    	if("buaa".equals(EtUsername.getText().toString()) && "123".equals(EtPassword.getText().toString()))   //≈–∂œ ’ ∫≈∫Õ√‹¬Î
         {
              //Intent intent = new Intent();
              //intent.setClass(Login.this,LoadingActivity.class);
              //startActivity(intent);
-          }
-        else if("".equals(mUser.getText().toString()) || "".equals(mPassword.getText().toString()))   //≈–∂œ ’ ∫≈∫Õ√‹¬Î
+        }
+        else if("".equals(EtUsername.getText().toString()) || "".equals(EtPassword.getText().toString()))   //≈–∂œ ’ ∫≈∫Õ√‹¬Î
         {
         	//new AlertDialog.Builder(Login.this)
 			//.setIcon(getResources().getDrawable(R.drawable.login_error_icon))
 			//.setTitle("µ«¬º¥ÌŒÛ")
 			//.setMessage("Œ¢–≈’ ∫≈ªÚ’ﬂ√‹¬Î≤ªƒ‹Œ™ø’£¨\n«Î ‰»Î∫Û‘Ÿµ«¬º£°")
 			//.create().show();
-         }
-        else{
-           
+        }
+        else
+        {
         	//new AlertDialog.Builder(Login.this)
 			//.setIcon(getResources().getDrawable(R.drawable.login_error_icon))
 			//.setTitle("µ«¬º ß∞‹")
@@ -55,11 +54,13 @@ public class Login extends Activity {
 		startActivity(intent);
 		Toast.makeText(getApplicationContext(), "µ«¬º≥…π¶", Toast.LENGTH_SHORT).show();
 		this.finish();*/
-      }  
-    public void login_back(View v) {     //±ÍÃ‚¿∏ ∑µªÿ∞¥≈•
-      	this.finish();
-      }  
-    public void login_pw(View v) {     //Õ¸º«√‹¬Î∞¥≈•
+    }  
+    
+    public void onBtnBackClicked(View v) {     //±ÍÃ‚¿∏ ∑µªÿ∞¥≈•
+      	finish();
+    }  
+    
+    public void onBtnForgetClicked(View v) {     //Õ¸º«√‹¬Î∞¥≈•
     	Uri uri = Uri.parse("http://3g.qq.com"); 
     	Intent intent = new Intent(Intent.ACTION_VIEW, uri); 
     	startActivity(intent);

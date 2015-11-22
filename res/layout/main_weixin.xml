@@ -85,7 +85,7 @@
         			android:layout_height="wrap_content"        	     	
         			android:scaleType="matrix"
         			android:clickable="true"
-        			android:src="@drawable/tab_find_frd_normal" />
+        			android:src="@drawable/tab_friends_normal" />
                 <TextView
             		android:layout_width="wrap_content"
             		android:layout_height="wrap_content"
