@@ -26,8 +26,8 @@
 			<com.shiningstone.myweixin.ControlOption  style="@style/option"
 			    local:Text="手机通讯录匹配" local:Mode="Bottom" />
 			
-			<com.shiningstone.myweixin.ControlOption  style="@style/option"
-			    local:Text="聊天背景" local:Mode="Bottom" />
+			<com.shiningstone.myweixin.ControlOption  style="@style/option_top"
+			    local:Text="聊天背景" local:Mode="Standalone" />
 
 			<Button 
 			    android:layout_width="fill_parent" 

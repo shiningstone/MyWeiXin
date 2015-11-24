@@ -1,6 +1,9 @@
 package com.shiningstone.myweixin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -19,7 +22,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 public class MainWeixin extends Activity {
@@ -50,7 +55,8 @@ public class MainWeixin extends Activity {
     private Headers mTabHeader;
     private int TAB_WIDTH = 0;
     private int CURSOR_OFFSET = 0;
-	private ViewPager mTabPager;	
+	private ViewPager mTabPager;
+    private ListDrawer mChatterList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,7 @@ public class MainWeixin extends Activity {
         
         initHeaders();
         initPageViewer();
+        mChatterList = new ListDrawer(this, R.layout.chatter_list_item);
     }
 
     @Override
@@ -91,6 +98,48 @@ public class MainWeixin extends Activity {
 		//Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);			
 		//startActivity(intent);	
 	}
+    
+	/*******************************************
+    	draw tab
+	 *******************************************/
+    class ListDrawer {
+        Activity mParent;
+        int mLayout = 0;
+        
+        public ListDrawer(Activity activity, int layout) {
+            mParent = activity;
+            mLayout = layout;
+        }
+        
+        public void update() {
+            ArrayList<HashMap<String, Object>> listItems = getItems();
+            
+            SimpleAdapter listItemAdapter = new SimpleAdapter(mParent, listItems,
+            		mLayout,
+                    new String[] {"head", "name", "time", "content"},  
+                    new int[] {R.id.head, R.id.name, R.id.time, R.id.content} 
+                );  
+            
+            ListView list = (ListView) mParent.findViewById(R.id.chatter_list);
+            list.setAdapter(listItemAdapter);
+        }
+        
+        protected ArrayList<HashMap<String, Object>> getItems() {
+            ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();  
+            for (int i = 0; i < 10; i++) {  
+                HashMap<String, Object> map = new HashMap<String, Object>();  
+                
+                map.put("head", R.drawable.ic_launcher);  
+                map.put("name", "名字"+i);  
+                map.put("time", "时间"+i);  
+                map.put("content", "内容"+i);  
+                
+                list.add(map);  
+            }  
+            
+            return list;
+        }
+    };
     
 	/*******************************************
         key actions
@@ -193,6 +242,12 @@ public class MainWeixin extends Activity {
     		    for(Header header : mList) {
                     if(header.mIvView==v) {
                         mTabPager.setCurrentItem(header.mId);
+                        
+                        switch(header.mId) {
+	                        case 0:
+	                        	mChatterList.update();
+	                        	break;
+                        }
                     }
                 }      
     		}
