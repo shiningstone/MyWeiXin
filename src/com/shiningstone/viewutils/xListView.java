@@ -12,22 +12,28 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 public abstract class xListView {
-	Activity mParent;         /* the activity use ListView */
-	int      mParentsList;    /* R.id.xxx,     the resource id of the ListView in the layout of activity */
-	int      mLayout;         /* R.layout.xxx  the layout of the ListView */
-	int[]    mElements;       /* R.id.xxx      each element need to be draw in the layout of the ListView */
+    public final class Desc {
+        Activity parent;         /* the activity use ListView */
+        int      idInParent;     /* R.id.xxx,     the resource id of the ListView in the layout of activity */
+        int      layout;         /* R.layout.xxx  the layout of the ListView */
+        int[]    elements;       /* R.id.xxx      each element need to be draw in the layout of the ListView */
+    };
 	
 	String[] xElements;       /* local variable */
-	
-	public xListView(Activity parent, int list, int layout, int[] elements) {
-		mParent = parent;
-		mParentsList = list;
-		mLayout = layout;
-		mElements = new int[elements.length];
-		xElements = new String[elements.length];
+    Desc     _view;
+    
+	public xListView(Activity parent, int listId, int layout, int[] elements) {
+		_view = new Desc();
+		
+		_view.parent = parent;
+		_view.idInParent = listId;
+		_view.layout = layout;
+		_view.elements = new int[elements.length];
+
+        xElements = new String[elements.length];
 		
 		for(int i=0;i<elements.length;i++) {
-			mElements[i] = elements[i];
+			_view.elements[i] = elements[i];
 			xElements[i] = "tag" + i;
 		}
 	}
@@ -39,15 +45,15 @@ public abstract class xListView {
 		for(int i=0;i<list.size();i++) {
 			HashMap<String,Object> map = new HashMap<String,Object>();
 			
-			for(int j=0;j<mElements.length;j++) {
+			for(int j=0;j<_view.elements.length;j++) {
 				map.put(xElements[j], list.get(i).get(j));
 			}
 			
 			listItems.add(map);
 		}
 		
-        ListView lv = (ListView) mParent.findViewById(mParentsList);
-        lv.setAdapter(new SimpleAdapter(mParent, listItems, mLayout, xElements, mElements));
+        ListView lv = (ListView) _view.parent.findViewById(_view.idInParent);
+        lv.setAdapter(new SimpleAdapter(_view.parent, listItems, _view.layout, xElements, _view.elements));
         lv.setOnItemClickListener(new onClickListener());
 	}
 	

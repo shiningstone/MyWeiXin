@@ -73,26 +73,7 @@ public class MainWeixin extends Activity {
         
         initHeaders();
         initPageViewer();
-        
-        int listItems[] = {R.id.head, R.id.name, R.id.time, R.id.content};
-        mChatterList = new xListView(this, R.id.chatter_list, R.layout.chatter_list_item, listItems) {
-			@Override
-			protected ArrayList<ArrayList<Object>> getItems() {
-	            ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();  
-	            for (int i = 0; i < 10; i++) {  
-	            	ArrayList<Object> elements = new ArrayList<Object>();  
-	                
-	            	elements.add(R.drawable.ic_launcher);  
-	            	elements.add("名字"+i);  
-	            	elements.add("时间"+i);  
-	            	elements.add("内容"+i);  
-	                
-	                list.add(elements);  
-	            }  
-	            
-	            return list;
-			}
-        };
+        initListView();
     }
 
     @Override
@@ -290,6 +271,30 @@ public class MainWeixin extends Activity {
 		}
 	}
 	
+	/*******************************************
+        list view
+    *******************************************/
+    private void initListView() {
+        int listItems[] = {R.id.head, R.id.name, R.id.time, R.id.content};
+        mChatterList = new xListView(this, R.id.chatter_list, R.layout.chatter_list_item, listItems) {
+			@Override
+			protected ArrayList<ArrayList<Object>> getItems() {
+	            ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();  
+	            for (int i = 0; i < 10; i++) {  
+	            	ArrayList<Object> elements = new ArrayList<Object>();  
+	                
+	            	elements.add(R.drawable.ic_launcher);  
+	            	elements.add("名字"+i);  
+	            	elements.add("时间"+i);  
+	            	elements.add("内容"+i);  
+	                
+	                list.add(elements);  
+	            }  
+	            
+	            return list;
+			}
+        };
+    }
 }
     
     
