@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -20,12 +21,16 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
+import com.shiningstone.viewutils.*;
 
 public class MainWeixin extends Activity {
 	/*******************************************
@@ -56,7 +61,7 @@ public class MainWeixin extends Activity {
     private int TAB_WIDTH = 0;
     private int CURSOR_OFFSET = 0;
 	private ViewPager mTabPager;
-    private ListDrawer mChatterList;
+    private xListView mChatterList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +73,26 @@ public class MainWeixin extends Activity {
         
         initHeaders();
         initPageViewer();
-        mChatterList = new ListDrawer(this, R.layout.chatter_list_item);
+        
+        int listItems[] = {R.id.head, R.id.name, R.id.time, R.id.content};
+        mChatterList = new xListView(this, R.id.chatter_list, R.layout.chatter_list_item, listItems) {
+			@Override
+			protected ArrayList<ArrayList<Object>> getItems() {
+	            ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>();  
+	            for (int i = 0; i < 10; i++) {  
+	            	ArrayList<Object> elements = new ArrayList<Object>();  
+	                
+	            	elements.add(R.drawable.ic_launcher);  
+	            	elements.add("名字"+i);  
+	            	elements.add("时间"+i);  
+	            	elements.add("内容"+i);  
+	                
+	                list.add(elements);  
+	            }  
+	            
+	            return list;
+			}
+        };
     }
 
     @Override
@@ -98,48 +122,6 @@ public class MainWeixin extends Activity {
 		//Intent intent = new Intent (MainWeixin.this,ShakeActivity.class);			
 		//startActivity(intent);	
 	}
-    
-	/*******************************************
-    	draw tab
-	 *******************************************/
-    class ListDrawer {
-        Activity mParent;
-        int mLayout = 0;
-        
-        public ListDrawer(Activity activity, int layout) {
-            mParent = activity;
-            mLayout = layout;
-        }
-        
-        public void update() {
-            ArrayList<HashMap<String, Object>> listItems = getItems();
-            
-            SimpleAdapter listItemAdapter = new SimpleAdapter(mParent, listItems,
-            		mLayout,
-                    new String[] {"head", "name", "time", "content"},  
-                    new int[] {R.id.head, R.id.name, R.id.time, R.id.content} 
-                );  
-            
-            ListView list = (ListView) mParent.findViewById(R.id.chatter_list);
-            list.setAdapter(listItemAdapter);
-        }
-        
-        protected ArrayList<HashMap<String, Object>> getItems() {
-            ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();  
-            for (int i = 0; i < 10; i++) {  
-                HashMap<String, Object> map = new HashMap<String, Object>();  
-                
-                map.put("head", R.drawable.ic_launcher);  
-                map.put("name", "名字"+i);  
-                map.put("time", "时间"+i);  
-                map.put("content", "内容"+i);  
-                
-                list.add(map);  
-            }  
-            
-            return list;
-        }
-    };
     
 	/*******************************************
         key actions
