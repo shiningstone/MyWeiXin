@@ -13,14 +13,14 @@ import android.widget.SimpleAdapter;
 
 public abstract class xListView {
     public final class Desc {
-        Activity parent;         /* the activity use ListView */
+        Activity parent;         /* the activity use this ListView */
         int      idInParent;     /* R.id.xxx,     the resource id of the ListView in the layout of activity */
         int      layout;         /* R.layout.xxx  the layout of the ListView */
         int[]    elements;       /* R.id.xxx      each element need to be draw in the layout of the ListView */
     };
 	
-	String[] xElements;       /* local variable */
     Desc     _view;
+	String[] xElements;          /* local variable */
     
 	public xListView(Activity parent, int listId, int layout, int[] elements) {
 		_view = new Desc();

@@ -57,9 +57,7 @@ public class MainWeixin extends Activity {
     *******************************************/
 	public static MainWeixin instance = null;
 	 
-    private Headers mTabHeader;
-    private int TAB_WIDTH = 0;
-    private int CURSOR_OFFSET = 0;
+    private xTabHeader mTabHeader;
 	private ViewPager mTabPager;
     private xListView mChatterList;
 
@@ -67,22 +65,19 @@ public class MainWeixin extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_weixin);
-         //启动activity时不自动弹出软键盘
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); //启动activity时不自动弹出软键盘
         instance = this;
         
-        initHeaders();
-        initPageViewer();
-        initListView();
+        createTabHeaders();
+        createPageViewer();
+        createChatterList();
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         if(hasFocus) {
-            TAB_WIDTH = getWindowManager().getDefaultDisplay().getWidth() / SRC_HEADER.length;
-            CURSOR_OFFSET = (TAB_WIDTH - findViewById(SRC_HEADER_CURSOR).getWidth())/2;
-
-            mTabHeader.choose(0);
+            mTabHeader.init(findViewById(SRC_HEADER_CURSOR).getWidth());
+            mChatterList.update();
         }
     }
 
@@ -129,8 +124,18 @@ public class MainWeixin extends Activity {
 	/*******************************************
         header actions
     *******************************************/
-    private void initHeaders() {
-        mTabHeader = new Headers();
+    private void createTabHeaders() {
+        mTabHeader = new xTabHeader(this) {
+			protected void onTabHeaderClick(int tabId) {
+                mTabPager.setCurrentItem(tabId);
+                
+                switch(tabId) {
+                    case 0:
+                        mChatterList.update();
+                        break;
+                }
+            }
+        };
 
         for(int i=0; i<SRC_HEADER.length; i++) {
             mTabHeader.add(findViewById(SRC_HEADER[i][0]), SRC_HEADER[i][1], SRC_HEADER[i][2]);
@@ -139,88 +144,10 @@ public class MainWeixin extends Activity {
         mTabHeader.addCursor(findViewById(SRC_HEADER_CURSOR));
     }
 
-    private class Headers {
-        private class Header {
-            private ImageView mIvView;
-            private int mId;
-            private int mNormalRes;
-            private int mPressedRes;
-            
-            public Header(int idx, View view, int normalRes, int pressedRes) {
-                mId = idx;
-                mIvView = (ImageView)view;
-                mNormalRes = normalRes;
-                mPressedRes = pressedRes;
-
-                mIvView.setOnClickListener(new HeaderClickListener());
-            }
-
-            public void setChoose(boolean flag) {
-                int resId = flag==true ? mPressedRes : mNormalRes;
-                mIvView.setImageDrawable( getResources().getDrawable(resId) );
-            }
-        };
-        
-        private ArrayList<Header> mList = new ArrayList<Header>();
-        private ImageView mIvCursor;
-        private int mChosen = 0;
-        
-        public void add(View view, int normalRes, int pressedRes) {
-            mList.add(new Header(mList.size(), view, normalRes, pressedRes));
-        }
-
-        public void addCursor(View view) {
-            mIvCursor = (ImageView)view;
-        }
-
-        public boolean choose(int target) {
-            moveCursor(mChosen, target);
-            
-            if(mChosen!=target) {
-                for(Header header : mList) {
-                    if(header.mId==target) {
-                        header.setChoose(true);
-                    } else {
-                        header.setChoose(false);
-                    }
-                }
-
-                mChosen = target;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        private void moveCursor(int from, int to) {
-            Animation animation = new TranslateAnimation(TAB_WIDTH*from+CURSOR_OFFSET, TAB_WIDTH*to+CURSOR_OFFSET, 0, 0);
-            animation.setFillAfter(true);
-            animation.setDuration(150);
-            mIvCursor.startAnimation(animation);
-        }
-        
-    	private class HeaderClickListener implements View.OnClickListener {
-    		@Override
-    		public void onClick(View v) {
-    		    for(Header header : mList) {
-                    if(header.mIvView==v) {
-                        mTabPager.setCurrentItem(header.mId);
-                        
-                        switch(header.mId) {
-	                        case 0:
-	                        	mChatterList.update();
-	                        	break;
-                        }
-                    }
-                }      
-    		}
-    	};
-    };
-
 	/*******************************************
         page viewer actions
     *******************************************/
-    private void initPageViewer() {
+    private void createPageViewer() {
         mTabPager = (ViewPager)findViewById(R.id.tabpager);
         mTabPager.setOnPageChangeListener(new MyOnPageChangeListener());
         
@@ -274,8 +201,9 @@ public class MainWeixin extends Activity {
 	/*******************************************
         list view
     *******************************************/
-    private void initListView() {
+    private void createChatterList() {
         int listItems[] = {R.id.head, R.id.name, R.id.time, R.id.content};
+        
         mChatterList = new xListView(this, R.id.chatter_list, R.layout.chatter_list_item, listItems) {
 			@Override
 			protected ArrayList<ArrayList<Object>> getItems() {
