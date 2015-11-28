@@ -12,32 +12,33 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 public abstract class xListView {
-    public final class Desc {
-        Activity parent;         /* the activity use this ListView */
-        int      idInParent;     /* R.id.xxx,     the resource id of the ListView in the layout of activity */
-        int      layout;         /* R.layout.xxx  the layout of the ListView */
-        int[]    elements;       /* R.id.xxx      each element need to be draw in the layout of the ListView */
-    };
+    Activity parent;         
+    int      controlId;        /* Activity的layout上的ListView控件 */
+    int      layout;         /* ListView的layout */
+    int[]    elements;       /* ListView layout上的每个元素id */
 	
-    Desc     _view;
-	String[] xElements;          /* local variable */
-    
-	public xListView(Activity parent, int listId, int layout, int[] elements) {
-		_view = new Desc();
-		
-		_view.parent = parent;
-		_view.idInParent = listId;
-		_view.layout = layout;
-		_view.elements = new int[elements.length];
+	String[] xElements;
+
+    /***************************
+        初始化接口函数
+    ***************************/
+	public xListView(Activity parent, int controlId, int layout, int[] elements) {
+		this.parent = parent;
+		this.controlId = controlId;
+		this.layout = layout;
+		this.elements = new int[elements.length];
 
         xElements = new String[elements.length];
 		
 		for(int i=0;i<elements.length;i++) {
-			_view.elements[i] = elements[i];
+			this.elements[i] = elements[i];
 			xElements[i] = "tag" + i;
 		}
 	}
 	
+    /***************************
+        绘制函数
+    ***************************/
 	public void update() {
 		ArrayList<ArrayList<Object>> list = getItems();
 		
@@ -45,18 +46,21 @@ public abstract class xListView {
 		for(int i=0;i<list.size();i++) {
 			HashMap<String,Object> map = new HashMap<String,Object>();
 			
-			for(int j=0;j<_view.elements.length;j++) {
+			for(int j=0;j<elements.length;j++) {
 				map.put(xElements[j], list.get(i).get(j));
 			}
 			
 			listItems.add(map);
 		}
-		
-        ListView lv = (ListView) _view.parent.findViewById(_view.idInParent);
-        lv.setAdapter(new SimpleAdapter(_view.parent, listItems, _view.layout, xElements, _view.elements));
-        lv.setOnItemClickListener(new onClickListener());
+
+        ListView control = (ListView) parent.findViewById(controlId);
+        control.setAdapter(new SimpleAdapter(parent, listItems, layout, xElements, elements));
+        control.setOnItemClickListener(new onClickListener());
 	}
 	
+    /***************************
+        回调函数，提供绘制list所需的资源
+    ***************************/
     protected abstract ArrayList<ArrayList<Object>> getItems();
 
     private class onClickListener implements OnItemClickListener {

@@ -19,28 +19,28 @@ public abstract class xTabHeader {
         单个按钮 
     ***************************/
     private class Icon {
-        private ImageView mIvView;     /* Activity的layout上的控件ID : R.id.xxx */
-        private int mNormalRes;        /* 平常状态对应的资源ID :  R.drawable.xxx */
-        private int mPressedRes;       /* 选中状态对应的资源ID :  R.drawable.xxx */
-        private int _No;               /* 按钮在面板上的顺序 */
+        private ImageView idInParent; /* Activity的layout上的控件ID : R.id.xxx */
+        private int normalRes;        /* 平常状态对应的资源ID :  R.drawable.xxx */
+        private int pressedRes;       /* 选中状态对应的资源ID :  R.drawable.xxx */
+        private int _No;              /* 按钮在面板上的顺序 */
         
         public Icon(int no, View view, int normalRes, int pressedRes) {
-            _No = no;
-            mIvView = (ImageView)view;
-            mNormalRes = normalRes;
-            mPressedRes = pressedRes;
+            this._No = no;
+            this.idInParent = (ImageView)view;
+            this.normalRes = normalRes;
+            this.pressedRes = pressedRes;
 
-            mIvView.setOnClickListener(new HeaderClickListener());
+            idInParent.setOnClickListener(new HeaderClickListener());
         }
 
         public void setChoose(boolean flag) {
-            int resId = flag==true ? mPressedRes : mNormalRes;
-            mIvView.setImageDrawable( mParent.getResources().getDrawable(resId) );
+            int resId = flag==true ? pressedRes : normalRes;
+            idInParent.setImageDrawable( mParent.getResources().getDrawable(resId) );
         }
     };
 
     private Activity mParent;           /* Activity */
-    private ImageView mIvCursor;        /* 选中标识的ImageView控件 */
+    private ImageView mIvIndicator;     /* 选中标识的ImageView控件 */
     private ArrayList<Icon> mIcons = new ArrayList<Icon>();
     
     private int TAB_WIDTH = 0;
@@ -58,8 +58,8 @@ public abstract class xTabHeader {
         mIcons.add(new Icon(mIcons.size(), view, normalRes, pressedRes));
     }
 
-    public void addCursor(View view) {
-        mIvCursor = (ImageView)view;
+    public void addIndicator(View view) {
+        mIvIndicator = (ImageView)view;
     }
 
     public void init(int cursorWidth) {
@@ -73,7 +73,7 @@ public abstract class xTabHeader {
         动作接口函数
     ***************************/
     public boolean choose(int target) {
-        moveCursor(_currentNo, target);
+        moveIndicator(_currentNo, target);
         
         if(_currentNo!=target) {
             for(Icon header : mIcons) {
@@ -96,18 +96,18 @@ public abstract class xTabHeader {
     ***************************/
     abstract protected void onTabHeaderClick(int tabId);
 
-    private void moveCursor(int from, int to) {
+    private void moveIndicator(int from, int to) {
         Animation animation = new TranslateAnimation(TAB_WIDTH*from+CURSOR_OFFSET, TAB_WIDTH*to+CURSOR_OFFSET, 0, 0);
         animation.setFillAfter(true);
         animation.setDuration(150);
-        mIvCursor.startAnimation(animation);
+        mIvIndicator.startAnimation(animation);
     }
 
     private class HeaderClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             for(Icon header : mIcons) {
-                if(header.mIvView==v) {
+                if(header.idInParent==v) {
                     onTabHeaderClick(header._No);
                 }
             }      

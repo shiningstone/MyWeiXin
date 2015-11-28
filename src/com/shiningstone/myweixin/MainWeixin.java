@@ -50,7 +50,7 @@ public class MainWeixin extends Activity {
         {R.id.img_settings, R.drawable.tab_settings_normal, R.drawable.tab_settings_pressed},
     };
 
-    private static int SRC_HEADER_CURSOR = R.id.img_tab_now;
+    private static int SRC_INDICATOR = R.id.img_tab_now;
 
 	/*******************************************
         local variables
@@ -76,7 +76,7 @@ public class MainWeixin extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         if(hasFocus) {
-            mTabHeader.init(findViewById(SRC_HEADER_CURSOR).getWidth());
+            mTabHeader.init(findViewById(SRC_INDICATOR).getWidth());
             mChatterList.update();
         }
     }
@@ -141,7 +141,7 @@ public class MainWeixin extends Activity {
             mTabHeader.add(findViewById(SRC_HEADER[i][0]), SRC_HEADER[i][1], SRC_HEADER[i][2]);
         }
 
-        mTabHeader.addCursor(findViewById(SRC_HEADER_CURSOR));
+        mTabHeader.addIndicator(findViewById(SRC_INDICATOR));
     }
 
 	/*******************************************
